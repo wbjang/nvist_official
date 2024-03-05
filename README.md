@@ -77,6 +77,8 @@ python -m preprocess.make_cache --data_dir ../../data/mvimgnet --split test
 
 Please get in touch with [me](mailto:won.jang1108@gmail.com) if you need the processed dataset.
 
+## Train NViST
+
 ### Fine-tuning MAE dataset
 
 Fist, download the pre-trained MAE from the official [MAE repository](https://github.com/facebookresearch/mae) or use this command below.
@@ -93,7 +95,7 @@ Then, run this command for fine-tuning.
 accelerate launch --mixed_precision=fp16 scripts/train_mae.py --config configs/mvimgnet_mae.txt --apply_minus_one_to_one_norm False --expname mae_mvimgnet_imgnet
 ```
 
-## Train NViST
+### Training NViST
 
 We support multi-GPUs operation using accelerate. Both batch size (number of images for encoder) and batch pixel sizes (number of pixels we use for rendering) are for 40GB A100 GPUs. Increase the learning rate by $\sqrt{N}$ if you increase your batch size and batch pixel size by $N$.
 
