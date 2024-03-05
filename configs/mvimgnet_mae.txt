@@ -1,0 +1,35 @@
+
+dataset_name=mvimgnet # dataset name - mvimgnet or shapenet
+data_dir=../../data/mvimgnet # dataset directory
+img_size=[160,90]
+vis_every=5000 # how you often visualize intermediate results
+
+batch_size=84
+vis_every=5000
+n_iters=30001 # number of iterations for training
+
+base_dir=../../output/mae_finetuned # output parent directory
+expname=mae_mvimgnet # output directory
+
+using_mae_pretrained=False # whether you would use the pretrained model as initialization
+
+lr_encoder_init=0.0001 # start lr rate (after warm up)
+lr_minimum=0.000001 # final lr rate
+encoder_warmup_iters=1000 # lr warmup until this iteration - to lr_encoder_init
+
+ckpt=False 
+
+# encoder
+encoder_patch_size=5 
+encoder_depth=12
+apply_minus_one_to_one_norm=False
+encoder_embed_dim=768
+encoder_num_heads=12
+
+# mae decoder
+mae_decoder_embed_dim=512
+mae_decoder_depth=8
+mae_decoder_num_heads=16
+masking_ratio=0.75 # masking ratio for MAE
+
+using_mae_pretrained=True

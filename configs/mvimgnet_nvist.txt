@@ -1,0 +1,81 @@
+
+dataset_name=mvimgnet_nerf # dataset name - mvimgnet/mvimgnet_nerf
+data_dir=../../data/mvimgnet # dataset directory
+img_size=[160,90]
+vis_every=5000 # how you often visualize intermediate results
+number_of_imgs_from_the_same_scene=5
+
+batch_size=4
+batch_pixel_size=60000
+vis_every=5000
+n_iters=300001 # number of iterations for training
+ckpt=False 
+
+base_dir=../../output/nvist # output parent directory
+expname=mvimgnet_test # output directory
+
+using_mae_pretrained=False # whether you would use the pretrained model as initialization
+using_mae_finetuned=True
+finetuned_mae_dir=../../output/mae_finetuned/mae_mvimgnet_imgnet
+initialize_decoder_with_pretrained=True
+
+lr_encoder_init=0.00004 # start lr rate (after warm up)
+lr_decoder_init=0.0002
+lr_renderer_init=0.0002
+lr_minimum=0.000001 # final lr rate
+encoder_warmup_iters=10000 # lr warmup until this iteration - to lr_encoder_init
+decoder_warmup_iters=10000
+renderer_warmup_iters=10000
+
+weight_lpips=0.1
+weight_dist=0.001
+
+# encoder
+encoder_patch_size=5 
+encoder_depth=12
+apply_minus_one_to_one_norm=False
+encoder_embed_dim=768
+encoder_num_heads=12
+
+# decoder
+resolution=48
+decoder_patch_size=3
+input_feature_dim=768
+decoder_embed_dim=768
+decoder_depth=12
+decoder_num_heads=12
+decoder_output_dim=32
+decoder_model=vector_matrix
+using_learnable_pos_embed=False
+using_encoded_visible_patches=True
+num_encoded_visible_patches=576
+using_cross_attention=True
+kv_separate_norm=True
+apply_decoder_embed=False
+apply_cam_dist_condition=True
+apply_focal_condition=True
+using_which_method_for_camera_parameters=adaln
+camera_params_pe_freq=4
+use_adaln_zero=False
+add_pe_on_y=True
+
+# renderer
+sigma_dim=8
+rgb_dim=24
+rgb_feature_dim=64
+sigma_activation=ReLU 
+concat_viewdir=True
+viewdir_pe=4
+using_sigmoid_at_rgb=True 
+apply_distloss=True
+using_sigma_mlp=False
+padding_zero=True 
+nSamples=48
+
+# mae decoder
+mae_decoder_embed_dim=512
+mae_decoder_depth=8
+mae_decoder_num_heads=16
+masking_ratio=0.75 # masking ratio for MAE
+
+
