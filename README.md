@@ -116,7 +116,7 @@ CUDA_VISIBLE_DEVICES=0 python scripts/eval_nvist.py --config <config_path> --ckp
 
 
 
-### Acknowledgement
+## Acknowledgement
 
 The research presented here has been partly supported by a sponsored research award from Cisco Research. This project made use of time on HPC Tier 2 facilities Baskerville (funded by EPSRC EP/T022221/1 and operated by ARC at the University of Birmingham) and JADE2 (funded by EPSRC EP/T022205/1). We are grateful to Niloy Mitra and Danail Stoyanov for fruitful discussions.
 
