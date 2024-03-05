@@ -125,6 +125,8 @@ The research presented here has been partly supported by a sponsored research aw
 
 Some parts of our code are adapted from below GitHub Repositories.
 
+[timm](https://github.com/huggingface/pytorch-image-models)
+
 [MAE](https://github.com/facebookresearch/mae)
 
 [TensoRF](https://github.com/apchenstu/TensoRF)
