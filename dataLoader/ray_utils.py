@@ -7,15 +7,15 @@ import numpy as np
 import torch
 from torch import Tensor
 from kornia import create_meshgrid
-from typing import Union, tuple
+from typing import Union, Tuple
 
-def get_inverse_pose(pose: np.ndarray, offset: Union[np.array, list, tuple]) -> np.ndarray:
+def get_inverse_pose(pose: np.ndarray, offset: Union[np.array, list, Tuple]) -> np.ndarray:
     """
     Computes the inverse of a given pose and applies an offset.
 
     Args:
         pose (np.ndarray): The pose matrix of shape [..., 4, 4].
-        offset (Union[np.ndarray, list, tuple]): The offset to be applied after inversion, should be of length 3.
+        offset (Union[np.ndarray, list, Tuple]): The offset to be applied after inversion, should be of length 3.
 
     Returns:
         np.ndarray: The inverted pose with the offset applied, of the same shape as input pose.
@@ -37,7 +37,7 @@ def get_inverse_pose(pose: np.ndarray, offset: Union[np.array, list, tuple]) -> 
     return pose_inv
 
 
-def get_rays(directions : Tensor, c2w : Tensor) -> tuple[Tensor, Tensor]:
+def get_rays(directions : Tensor, c2w : Tensor) -> Tuple[Tensor, Tensor]:
     """
     Get ray origin and normalized directions in world coordinates for all pixels in one image.
 
@@ -46,7 +46,7 @@ def get_rays(directions : Tensor, c2w : Tensor) -> tuple[Tensor, Tensor]:
         c2w (Tensor): Transformation matrix from camera coordinates to world coordinates (3, 4).
 
     Returns:
-        tuple[Tensor, Tensor]: A tuple containing:
+        Tuple[Tensor, Tensor]: A Tuple containing:
             - rays_o (Tensor): The origin of the rays in world coordinates (H*W, 3).
             - rays_d (Tensor): The normalized direction of the rays in world coordinates (H*W, 3).
     """
