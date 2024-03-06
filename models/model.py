@@ -113,7 +113,7 @@ class Model(nn.Module):
             else: 
                 print(f"Layer {layer} not found in encoder")
 
-    def forward(self, input_images, camera_params, ro_train, rd_train):
+    def forward(self, input_images: Tensor, camera_params: Tensor, ro_train: Tensor, rd_train: Tensor, is_train=True):
         """
         Forwards input through the model to generate output images.
 
@@ -122,6 +122,7 @@ class Model(nn.Module):
             camera_params (torch.Tensor): Camera parameters for conditional rendering.
             ro_train (torch.Tensor): Ray origins for training samples.
             rd_train (torch.Tensor): Ray directions for training samples.
+            is_train (bool): True - if True, we add the randomness on fixed points along the ray
 
         Returns:
             dict: Rendered output images and potentially additional data like depth maps.
@@ -129,7 +130,7 @@ class Model(nn.Module):
 
         latent_vectors =self.encoder.forward_encoder_only(input_images)
         matrices, vectors = self.decoder(latent_vectors, camera_params)
-        output = self.renderer(ro_train, rd_train, matrices, vectors)
+        output = self.renderer(ro_train, rd_train, matrices, vectors, is_train=is_train)
         return output
 
 

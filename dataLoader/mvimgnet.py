@@ -10,10 +10,12 @@ import torch
 from torch.utils.data import Dataset
 from .ray_utils import get_ray_directions, get_inverse_pose, get_rays
 from torchvision.transforms import ToTensor
+from torch import Tensor
+from typing import Tuple, Union, List
 
 # for MAE
 class MVImgNet(Dataset):
-    def __init__(self, datadir, split='train', img_wh=[90,160]):
+    def __init__(self, datadir: str, split: str = 'train', img_wh: List[int]=[90,160]):
         super().__init__()
         self.root_dir = datadir
 
@@ -31,25 +33,27 @@ class MVImgNet(Dataset):
         self.ending_idxs = list(np.cumsum(self.number_of_imgs_per_scene))
         self.original_img_hws = cache['img_sizes_hw']
         self.num_objs = self.starting_idxs + self.ending_idxs[-1:]
+        
 
-    def __len__(self): return len(self.img_files)
+    def __len__(self): 
+        return len(self.img_files)
 
 
-    def sample_from_same_scene(self, index):
+    def sample_from_same_scene(self, index: int) -> Tuple[int, int, int]:
         scene_idx = [it for it, _ in enumerate(self.starting_idxs) if index >= self.starting_idxs[it] and index < self.ending_idxs[it]]
         return self.starting_idxs[scene_idx[0]], self.ending_idxs[scene_idx[0]], scene_idx[0]
     
-    def load_image(self, index, scene_idx):
+    def load_image(self, index: int, scene_idx: int) -> np.ndarray:
         origin_H, origin_W = self.original_img_hws[scene_idx]
         imgs = np.array(Image.open(self.img_files[index]).resize([origin_W, origin_H], Image.LANCZOS).convert('RGB')) / 255.
         return imgs
     
-    def load_images(self, idxs, scene_idx):
+    def load_images(self, idxs: List[int], scene_idx: int) -> np.ndarray:
         origin_H, origin_W = self.original_img_hws[scene_idx]
         imgs = [np.array(Image.open(self.img_files[idx]).resize([origin_W, origin_H], Image.LANCZOS))/255. for idx in idxs]
         return np.stack(imgs)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: Tensor) -> dict:
         output = dict()
         _, _, scene_idx = self.sample_from_same_scene(index)
         return_imgs = [self.load_image(it, scene_idx) for it in [index]]
@@ -61,8 +65,8 @@ class MVImgNet(Dataset):
         return output
     
 class MVImgNetNeRF(Dataset):
-    def __init__(self, datadir, split='train', 
-                 img_wh=[90,160], number_of_imgs_from_the_same_scene=4):
+    def __init__(self, datadir: str, split: str='train', 
+                 img_wh: List[int]=[90,160], number_of_imgs_from_the_same_scene: int=4):
 
         self.root_dir = datadir 
         self.white_bg = False
@@ -89,14 +93,15 @@ class MVImgNetNeRF(Dataset):
         self.n_scenes = len(self.number_of_imgs_per_scene)
 
 
-    def __len__(self): return len(self.img_files)
+    def __len__(self): 
+        return len(self.img_files)
 
-    def load_image(self, index, scene_index):
+    def load_image(self, index: Union[int, np.int_], scene_index: int) -> np.ndarray:
         origin_H, origin_W = self.original_img_hws[scene_index]
         imgs = np.array(Image.open(self.img_files[index]).resize([origin_W, origin_H], Image.LANCZOS).convert('RGB')) / 255.
         return imgs
 
-    def get_data(self, scene_idx, return_scene_name = False):
+    def get_data(self, scene_idx: int, return_scene_name = False) -> Union[Tuple[List[Tensor], List[Tensor], List[Tensor], List[float], Tensor], Tuple[List[Tensor], List[Tensor], List[Tensor], List[float], Tensor, str]]:
         idxs = torch.arange(self.starting_idxs[scene_idx], self.ending_idxs[scene_idx])
         imgs = [ToTensor()(Image.open(self.img_files[idx])).unsqueeze(0) for idx in idxs]
         c2ws = [self.c2ws[idx] for idx in idxs]
@@ -105,7 +110,7 @@ class MVImgNetNeRF(Dataset):
         zero_inverse_pose =  get_inverse_pose(c2ws[test_idx], offset=np.array([0,0,-campos]))
         c2ws = [zero_inverse_pose@c2w for c2w in c2ws]
 
-        directions = get_ray_directions(self.img_wh[1], self.img_wh[0], [self.focals[scene_idx], self.focals[scene_idx]])
+        directions = get_ray_directions(self.img_wh[1], self.img_wh[0], Tensor([self.focals[scene_idx], self.focals[scene_idx]]))
         directions = directions / torch.norm(directions, dim=-1, keepdim=True)
 
         ray_origins_directions = [get_rays(directions, torch.from_numpy(c2w).float()) for c2w in c2ws]
@@ -121,11 +126,11 @@ class MVImgNetNeRF(Dataset):
 
         return imgs, ros, rds, normalized_focals, imgs[test_idx]
 
-    def sample_from_same_scene(self, index):
+    def sample_from_same_scene(self, index: int) -> Tuple[int, int, int]:
         scene_idx = [it for it, _ in enumerate(self.starting_idxs) if index >= self.starting_idxs[it] and index < self.ending_idxs[it]]
         return self.starting_idxs[scene_idx[0]], self.ending_idxs[scene_idx[0]], scene_idx[0]
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: Tensor) -> dict:
         output = dict()
         start_idx, end_idx, scene_idx = self.sample_from_same_scene(index)
 
@@ -143,8 +148,7 @@ class MVImgNetNeRF(Dataset):
         zero_inverse_pose =  get_inverse_pose(c2ws[0], offset=np.array([0,0,-campos]))
         c2ws = [zero_inverse_pose@c2w for c2w in c2ws]
 
-        # ray_direction is related to intrinsic - same for all scenes (at least in NeRF-synthetic)
-        directions = get_ray_directions(self.img_wh[1], self.img_wh[0], [self.focals[scene_idx], self.focals[scene_idx]])
+        directions = get_ray_directions(self.img_wh[1], self.img_wh[0], Tensor([self.focals[scene_idx], self.focals[scene_idx]]))
         directions = directions / torch.norm(directions, dim=-1, keepdim=True)
 
         ray_origins_directions = [get_rays(directions, torch.from_numpy(c2w).float()) for c2w in c2ws]
