@@ -1,5 +1,5 @@
 
-## NViST : In the Wild New View Synthesis from a Single Image using Transformers
+## NViST : In the Wild New View Synthesis from a Single Image with Transformers
 
 CVPR 2024
 
