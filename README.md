@@ -7,7 +7,7 @@ CVPR 2024
 
 University College London
 
-### [Paper](https://arxiv.org/abs/2312.08568) | [Project Page](https://wbjang.github.io/nvist_webpage) | [X (Twitter)](https://twitter.com/wbjang11/status/1765453564782997833)
+### [Paper](https://arxiv.org/abs/2312.08568) | [Project Page](https://wbjang.github.io/nvist_webpage) | [X (Twitter) Post](https://twitter.com/wbjang11/status/1765453564782997833)
 ![Teaser Animation](media/teaser_nvist.gif)
 
 NViST turns in-the-wild single images into implicit 3D functions with a single pass using Transformers.
