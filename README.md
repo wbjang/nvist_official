@@ -140,6 +140,21 @@ Some parts of our code are adapted from below GitHub Repositories.
 
 If you find our work useful in your research, please consider citing our paper.
 
+(CVPR)
+```sh
+@InProceedings{Jang_2024_CVPR,
+        author    = {Jang, Wonbong and Agapito, Lourdes},
+        title     = {NViST: In the Wild New View Synthesis from a Single Image with Transformers},
+        booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) },
+        month     = {June},
+        year      = {2024},
+        pages     = {10181-10193}
+    }
+```
+
+
+(Arxiv)
+
 ```sh
 @article{jang2023nvist,
     title={NViST: In the Wild New View Synthesis from a Single Image with Transformers}, 
