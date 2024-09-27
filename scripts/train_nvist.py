@@ -265,36 +265,36 @@ def main():
             ckpt = {'state_dict':model.state_dict(), 'iteration':iteration}
             torch.save(ckpt, os.path.join(output_dir, 'nvist.pth'))
 
-        if iteration > 0 and iteration % args.render_test_all == 0:
-            jump_idx = 1
-            with torch.no_grad():
-                for scene_idx in range(0, len(test_dataset.num_objs), jump_idx):
-                    test_images, ros, rds, normalized_focals, test_input = test_dataset.get_data(scene_idx)
-                    camdist = -ros[len(ros) // 2][0,0,2]
-                    camera_params = camdist.reshape(-1,1).repeat(len(test_images),1).float()
-                    if args.apply_focal_condition:
-                        camera_params = torch.cat([camera_params, torch.tensor(normalized_focals).reshape(-1,1).float()], dim=-1)
-                    vis_images = [test_input]
-                    test_input = test_input.to(accelerator.device)
-                    psnr_tmp, lpips_tmp = [], []
-                    for test_image, ro, rd, camera_param in zip(test_images, ros, rds, camera_params):                
-                        test_image, ro, rd, camera_param = test_image.to(accelerator.device), ro.to(accelerator.device), rd.to(accelerator.device), camera_param.to(accelerator.device)
-                        output = model(test_input, camera_param,ro, rd)
-                        loss_l2 = torch.mean((output['rgb_map'].reshape(1,H,W,3).permute(0,3,1,2) - test_image)**2)
-                        psnr_tmp.append(-10 * np.log(loss_l2.item()) / np.log(10))
-                        lpips_tmp.append(loss_fn_lpips(test_image, output['rgb_map'].reshape(1,H,W,3).permute(0,3,1,2)).item())
-                        vis_images.append(output['rgb_map'].reshape(1,H,W,3).permute(0,3,1,2).detach().cpu())
-                        vis_images.append(test_image.detach().cpu())
-                        depth = visualize_depth(output['depth_map'].reshape(H,W))
-                        vis_images.append(depth.detach().cpu())
-                    scenertx = f'{scene_idx:03d}'
-                    test_vis = visualize_images(torch.cat(vis_images))
-                    imageio.imwrite(os.path.join(output_dir, 'imgs_test', prtx + '_' + scenertx + '.png'), test_vis)
-                    psnr_test.append(np.mean(psnr_tmp))
-                    lpips_test.append(np.mean(lpips_tmp))
-                np.savetxt(os.path.join(output_dir, 'imgs_test', prtx + '.txt'), np.asarray([np.mean(psnr_test), np.mean(lpips_test)]))
-                summary_writer.add_scalar('test/psnr_all', np.mean(psnr_test), global_step=iteration)
-                summary_writer.add_scalar('test/lpips_all', np.mean(lpips_test), global_step=iteration)        
+        # if iteration > 0 and iteration % args.render_test_all == 0:
+        #     jump_idx = 1
+        #     with torch.no_grad():
+        #         for scene_idx in range(0, len(test_dataset.num_objs), jump_idx):
+        #             test_images, ros, rds, normalized_focals, test_input = test_dataset.get_data(scene_idx)
+        #             camdist = -ros[len(ros) // 2][0,0,2]
+        #             camera_params = camdist.reshape(-1,1).repeat(len(test_images),1).float()
+        #             if args.apply_focal_condition:
+        #                 camera_params = torch.cat([camera_params, torch.tensor(normalized_focals).reshape(-1,1).float()], dim=-1)
+        #             vis_images = [test_input]
+        #             test_input = test_input.to(accelerator.device)
+        #             psnr_tmp, lpips_tmp = [], []
+        #             for test_image, ro, rd, camera_param in zip(test_images, ros, rds, camera_params):                
+        #                 test_image, ro, rd, camera_param = test_image.to(accelerator.device), ro.to(accelerator.device), rd.to(accelerator.device), camera_param.to(accelerator.device)
+        #                 output = model(test_input, camera_param,ro, rd)
+        #                 loss_l2 = torch.mean((output['rgb_map'].reshape(1,H,W,3).permute(0,3,1,2) - test_image)**2)
+        #                 psnr_tmp.append(-10 * np.log(loss_l2.item()) / np.log(10))
+        #                 lpips_tmp.append(loss_fn_lpips(test_image, output['rgb_map'].reshape(1,H,W,3).permute(0,3,1,2)).item())
+        #                 vis_images.append(output['rgb_map'].reshape(1,H,W,3).permute(0,3,1,2).detach().cpu())
+        #                 vis_images.append(test_image.detach().cpu())
+        #                 depth = visualize_depth(output['depth_map'].reshape(H,W))
+        #                 vis_images.append(depth.detach().cpu())
+        #             scenertx = f'{scene_idx:03d}'
+        #             test_vis = visualize_images(torch.cat(vis_images))
+        #             imageio.imwrite(os.path.join(output_dir, 'imgs_test', prtx + '_' + scenertx + '.png'), test_vis)
+        #             psnr_test.append(np.mean(psnr_tmp))
+        #             lpips_test.append(np.mean(lpips_tmp))
+        #         np.savetxt(os.path.join(output_dir, 'imgs_test', prtx + '.txt'), np.asarray([np.mean(psnr_test), np.mean(lpips_test)]))
+        #         summary_writer.add_scalar('test/psnr_all', np.mean(psnr_test), global_step=iteration)
+        #         summary_writer.add_scalar('test/lpips_all', np.mean(lpips_test), global_step=iteration)        
 
         
 if __name__ == "__main__":
